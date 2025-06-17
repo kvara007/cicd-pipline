@@ -28,6 +28,27 @@ pipeline {
                 sh "docker build -t ${imageName} ."
                 }
             }
+        stage("deploy") {
+            steps {
+                script {
+                    // The conatiner from previous deployment is running, so we need to stop and remove it, before startging new one
+                    def containerName = "node-${env.BRANCH_NAME}"
+                    sh "docker stop ${containerName} || true"   // If command fails run true, always succeeeds.
+                    sh "docker rm ${containerName} || true"
+
+                    def port = env.BRANCH_NAME == "main" ? "3000" : "3001"
+                    def imageName = env.BRANCH_NAME == "main" ? "nodemain:v1.0" : "nodedev:v1.0"
+                    sh "docker run -d --name ${containerName} -p ${port}:3000 ${imageName}"
+
+                }
+            }
         }
     }
-}
+
+/* 
+Monday: Deploy main version 1.0 → node-main container running
+Wednesday: Update code, push to main
+Need to deploy main version 1.1 → BUT node-main container (v1.0) is still running
+Can't have two containers with same name
+So: Stop old container (v1.0) → Remove it → Start new container (v1.1) 
+*/
