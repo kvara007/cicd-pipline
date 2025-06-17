@@ -1,4 +1,3 @@
-Groovy
 pipeline {
     // agent any is equivalent to node 'master'
     agent any
