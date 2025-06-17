@@ -1,6 +1,7 @@
 pipeline {
     // agent any is equivalent to node 'master'
     agent any
+    tools {nodejs "node"}
     stages {
         stage('Checkout') {
             steps {
