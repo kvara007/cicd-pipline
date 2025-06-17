@@ -28,10 +28,11 @@ pipeline {
                 sh "docker build -t ${imageName} ."
                 }
             }
+        }
         stage("deploy") {
             steps {
                 script {
-                    // The conatiner from previous deployment is running, so we need to stop and remove it, before startging new one
+                    // The container from previous deployment is running, so we need to stop and remove it, before starting new one
                     def containerName = "node-${env.BRANCH_NAME}"
                     sh "docker stop ${containerName} || true"   // If command fails run true, always succeeeds.
                     sh "docker rm ${containerName} || true"
@@ -45,4 +46,3 @@ pipeline {
             }
         }
     }
-}
