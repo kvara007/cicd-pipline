@@ -29,20 +29,16 @@ pipeline {
                 }
             }
         }
-        stage("deploy") {
+        stage("Push Imaage") {
             steps {
                 script {
-                    // The container from previous deployment is running, so we need to stop and remove it, before starting new one
-                    def containerName = "node-${env.BRANCH_NAME}"
-                    sh "docker stop ${containerName} || true"   // If command fails run true, always succeeeds.
-                    sh "docker rm ${containerName} || true"
-
-                    def port = env.BRANCH_NAME == "main" ? "3000" : "3001"
-                    def imageName = env.BRANCH_NAME == "main" ? "nodemain:v1.0" : "nodedev:v1.0"
-                    sh "docker run -d --name ${containerName} -p ${port}:3000 ${imageName}"
+                    def imageName = env.BRANCH_NAME == "main" ? "kvara007/nodemain:v1.0" : "kvara007/nodedev:v1.0"
+                    docker.withRegistry('', 'dockerhub_creds') {
+                      sh "docker push ${imageName}"
 
                     }
                 }
             }
         }
     }
+}
