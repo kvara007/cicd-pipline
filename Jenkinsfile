@@ -14,5 +14,13 @@ pipeline {
                 sh "./scripts/build.sh"
             }
         }
+    
+        stage("test") {
+            // runs test.sh >> test.sh runs /src App.test.js
+            steps {
+                sh "chmod +x ./scripts/test.sh"
+                sh "./scripts/test.sh"
+            }
+        }
     }
 }
