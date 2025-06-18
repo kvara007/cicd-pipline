@@ -1,7 +1,11 @@
 pipeline {
-    // agent any is equivalent to node 'master'
-    agent any
-    tools {nodejs "node"}
+    agent {
+       docker {
+           image 'node:16'
+           // Mounts Docker socket, the container can runn Docker commands (Docker-in-Docker)
+           args '-v /var/run/docker.sock:/var/run/docker.sock'
+       }
+   }
     stages {
         stage('Checkout') {
             steps {
@@ -10,7 +14,7 @@ pipeline {
         }
         stage('Dockerfile Lint') {
             steps {
-                // Checks Docker fille syntax and security issues.
+                // Checks Docker fille syntax and security issues.    is not it ending?!!!!!!
                 sh "docker run --rm -i hadolint/hadolint < Dockerfile"
         }
     }
