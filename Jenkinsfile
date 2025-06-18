@@ -49,7 +49,8 @@ pipeline {
         }
 
         stage('Trigger Deploy') {
-            steps { echo "Triggering deployments based on branch..."
+            steps { 
+                echo "Triggering deployments based on branch..."
                 script {
                     if (env.BRANCH_NAME == 'main') {
                         build job: 'Deploy_to_main', wait: false
