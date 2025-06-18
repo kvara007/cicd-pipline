@@ -43,15 +43,13 @@ pipeline {
             steps {
                 script {
                     def imageName = env.BRANCH_NAME == "main" ? "kvara007/nodemain:v1.0" : "kvara007/nodedev:v1.0"
-                    def registry = "docker.io/${imageName}"
-                    def vulnerabilities = sh(script: "trivy image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${imageName}", returnStdout: true).trim()
-                    echo "Vulnerability Report:\n${vulnerabilities}"
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${imageName}"
                 }
             }
         }
 
         stage('Trigger Deploy') {
-            steps {
+            steps { echo "Triggering deployments based on branch..."
                 script {
                     if (env.BRANCH_NAME == 'main') {
                         build job: 'Deploy_to_main', wait: false
