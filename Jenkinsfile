@@ -3,10 +3,15 @@ pipeline {
        docker {
            image 'node:16'
            // Mounts Docker socket, the container can runn Docker commands (Docker-in-Docker)
-           args '-v /var/run/docker.sock:/var/run/docker.sock'
+           args '-v /var/run/docker.sock:/var/run/docker.sock -u root'
        }
    }
     stages {
+        stage('Install Docker') {
+           steps {
+               sh 'apt-get update && apt-get install -y docker.io'
+           }
+       }
         stage('Checkout') {
             steps {
                 checkout scm
