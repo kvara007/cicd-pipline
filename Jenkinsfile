@@ -29,13 +29,34 @@ pipeline {
                 }
             }
         }
-        stage("Push Imaage") {
+        stage("Push Image") {
             steps {
                 script {
                     def imageName = env.BRANCH_NAME == "main" ? "kvara007/nodemain:v1.0" : "kvara007/nodedev:v1.0"
                     docker.withRegistry('', 'dockerhub_creds') {
                       sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }    
+        stage('Scan Docker Image for Vulnerabilities') {
+            steps {
+                script {
+                    def imageName = env.BRANCH_NAME == "main" ? "kvara007/nodemain:v1.0" : "kvara007/nodedev:v1.0"
+                    def registry = "docker.io/${imageName}"
+                    def vulnerabilities = sh(script: "trivy image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${imageName}", returnStdout: true).trim()
+                    echo "Vulnerability Report:\n${vulnerabilities}"
+                }
+            }
+        }
 
+        stage('Trigger Deploy') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        build job: 'Deploy_to_main', wait: false
+                    } else if (env.BRANCH_NAME == 'dev') {
+                        build job: 'Deploy_to_dev', wait: false
                     }
                 }
             }
