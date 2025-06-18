@@ -8,6 +8,12 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Dockerfile Lint') {
+            steps {
+                // Checks Docker fille syntax and security issues.
+                sh "docker run --rm -i hadolint/hadolint < Dockerfile"
+        }
+    }
         stage('Build') {
             steps {
                 sh "chmod +x ./scripts/build.sh"
